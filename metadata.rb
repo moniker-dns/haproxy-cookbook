@@ -14,4 +14,3 @@ recipe "haproxy::app_lb", "Installs and configures haproxy by searching for node
 end
 
 depends           "cpu", ">= 0.2.0"
-depends           "build-essential"

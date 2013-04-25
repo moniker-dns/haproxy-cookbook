@@ -37,7 +37,7 @@ Attributes
   will configure httpchk in haproxy.conf
 * `node['haproxy']['ssl_httpchk']` - used by the `app_lb` recipe. If
   set and `enable_ssl` is true, will configure httpchk in haproxy.conf
-  for the `ssl_application` section
+  for the `ssl_applicaiton` section
 * `node['haproxy']['enable_admin']` - whether to enable the admin
   interface. default true. Listens on port 22002.
 * `node['haproxy']['admin']['address_bind']` - sets the address to
@@ -70,27 +70,6 @@ Attributes
   config, set the the maxconn per frontend member
 * `node['haproxy']['frontend_ssl_max_connections']` - in the `app_lb`
   config, set the maxconn per frontend member using SSL
-* `node['haproxy']['install_method']` - determines which method is
-  used to install haproxy, must be 'source' or 'package'. defaults to
-  'package'
-* `node['haproxy']['conf_dir']` - the location of the haproxy config
-  file
-* `node['haproxy']['source']['version']` - the version of haproxy to
-  install
-* `node['haproxy']['source']['url']` - the full URL to the haproxy
-  source package
-* `node['haproxy']['source']['checksum']` - the checksum of the
-  haproxy source package
-* `node['haproxy']['source']['prefix']` - the prefix used to `make
-  install` haproxy
-* `node['haproxy']['source']['target_os']` - the target used to
-  `make` haproxy
-* `node['haproxy']['source']['target_cpu']` - the target cpu used to
-  `make` haproxy
-* `node['haproxy']['source']['target_arch']` - the target arch used
-  to `make` haproxy
-* `node['haproxy']['source']['use_pcre']` - whether to build with
-  libpcre support
 
 Recipes
 =======
@@ -111,16 +90,6 @@ search. See __Usage__ below.
 
 Uses the community `cpu` cookbook's `cpu_affinity` LWRP to set
 affinity for the haproxy process.
-
-## install\_package
-
-Installs haproxy through the package manager. Used by the `default`
-and `app_lb` recipes.
-
-## install\_source
-
-Installs haproxy from source. Used by the `default` and `app_lb`
-recipes.
 
 Usage
 =====

@@ -1,0 +1,44 @@
+global
+  log 127.0.0.1   local0
+  log 127.0.0.1   local1 notice
+  #log loghost    local0 info
+  maxconn <%= node['haproxy']['global_max_connections'] %>
+  #debug
+  #quiet
+  user <%= node['haproxy']['user'] %>
+  group <%= node['haproxy']['group'] %>
+
+defaults
+  log     global
+  mode    http
+  retries 3
+  <% @defaults_timeouts.sort.map do | value, time | -%>
+  timeout <%= value %> <%= time %>
+  <% end -%>
+  <% @defaults_options.sort.each do | option | -%>
+  option <%= option %>
+  <% end -%>
+  balance  <%= node['haproxy']['balance_algorithm'] %>
+
+# Set up application listeners here.
+
+frontend mysql
+  mode tcp
+  option tcplog
+  maxconn <%= node['haproxy']['frontend_max_connections'] %>
+  bind <%= node['haproxy']['incoming_address'] %>:<%= node['haproxy']['incoming_port'] %>
+  default_backend mysql
+
+backend mysql
+  mode tcp
+  balance <%= node['haproxy']['balance_algorithm'] %>
+  option httpchk
+  <% @pool_members.each do |member| -%>
+  server <%= member[:hostname] %> <%= member[:ipaddress] %>:<%= node['haproxy']['member_port'] %> check port <%= node['haproxy']['check_port'] %> inter 12000 rise 3 fall 3
+  <% end -%>
+
+<% if node['haproxy']['enable_admin'] -%>
+listen admin <%= node['haproxy']['admin']['address_bind'] %>:<%= node['haproxy']['admin']['port'] %>
+  mode http
+  stats uri /
+<% end -%>

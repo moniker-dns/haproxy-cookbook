@@ -22,6 +22,7 @@ default['haproxy']['incoming_port'] = 80
 default['haproxy']['member_port'] = 8080
 default['haproxy']['app_server_role'] = "webserver"
 default['haproxy']['balance_algorithm'] = "roundrobin"
+default['haproxy']['enable_http'] = true
 default['haproxy']['enable_ssl'] = false
 default['haproxy']['ssl_incoming_address'] = "0.0.0.0"
 default['haproxy']['ssl_incoming_port'] = 443
@@ -32,6 +33,8 @@ default['haproxy']['enable_admin'] = true
 default['haproxy']['admin']['address_bind'] = "127.0.0.1"
 default['haproxy']['admin']['port'] = 22002
 default['haproxy']['pid_file'] = "/var/run/haproxy.pid"
+default['haproxy']['check_port'] = 9200 
+
 
 default['haproxy']['defaults_options'] = ["httplog", "dontlognull", "redispatch"]
 default['haproxy']['x_forwarded_for'] = false
@@ -46,15 +49,3 @@ default['haproxy']['global_max_connections'] = 4096
 default['haproxy']['member_max_connections'] = 100
 default['haproxy']['frontend_max_connections'] = 2000
 default['haproxy']['frontend_ssl_max_connections'] = 2000
-
-default['haproxy']['install_method'] = 'package'
-default['haproxy']['conf_dir'] = '/etc/haproxy'
-
-default['haproxy']['source']['version'] = '1.4.22'
-default['haproxy']['source']['url'] = 'http://haproxy.1wt.eu/download/1.4/src/haproxy-1.4.22.tar.gz'
-default['haproxy']['source']['checksum'] = 'ba221b3eaa4d71233230b156c3000f5c2bd4dace94d9266235517fe42f917fc6'
-default['haproxy']['source']['prefix'] = '/usr/local'
-default['haproxy']['source']['target_os'] = 'generic'
-default['haproxy']['source']['target_cpu'] = ''
-default['haproxy']['source']['target_arch'] = ''
-default['haproxy']['source']['use_pcre'] = false

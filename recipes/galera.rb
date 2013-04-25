@@ -1,6 +1,9 @@
 #
 # Cookbook Name:: haproxy
-# Recipe:: app_lb
+# Recipe:: galera
+#
+# recipe to support dropping haproxy infront of a Galera MySQL cluster
+# http://www.mysqlperformanceblog.com/2012/06/20/percona-xtradb-cluster-reference-architecture-with-haproxy/
 #
 # Copyright 2011, Opscode, Inc.
 #
@@ -22,19 +25,16 @@ pool_members = search("node", "role:#{node['haproxy']['app_server_role']} AND ch
 # load balancer may be in the pool
 pool_members << node if node.run_list.roles.include?(node['haproxy']['app_server_role'])
 
-# we prefer connecting via local_ipv4 if
-# pool members are in the same cloud
-# TODO refactor this logic into library...see COOK-494
+
+# we prefer connecting via the private ip if 
+# pool members are in the same region/az
 pool_members.map! do |member|
   server_ip = begin
-    if member.attribute?('meta_data')
-      Chef::Log.info "we #{node['hostname']} are in #{node['meta_data']['region']}"
-      Chef::Log.info "potential pool member #{member['hostname']} is in #{member['meta_data']['region']}"
-      if node.attribute?('meta_data') && (member['meta_data']['region'] == node['meta_data']['region'])
-        Chef::Log.info "using private_ipv4 #{member['meta_data']['private_ipv4']} for the pool_member"
+    # meta_data is supplied by dnsaas::meta_data
+    if member.attribute?('meta_data') && member['meta_data'].attribute?('region')
+      if node.attribute?('meta_data') && (member['meta_data']['region'] == node['meta_data']['region']) && !member['meta_data']['region'].nil?
         member['meta_data']['private_ipv4']
       else
-        Chef::Log.info "using public_ipv4 #{member['meta_data']['public_ipv4']} for the pool_member"
         member['meta_data']['public_ipv4']
       end
     else
@@ -53,11 +53,11 @@ cookbook_file "/etc/default/haproxy" do
   owner "root"
   group "root"
   mode 00644
-  notifies :restart, "service[haproxy]"
+  notifies :restart, "service[haproxy]", :immediately
 end
 
 template "/etc/haproxy/haproxy.cfg" do
-  source "haproxy-app_lb.cfg.erb"
+  source "haproxy-galera.cfg.erb"
   owner "root"
   group "root"
   mode 00644
@@ -66,7 +66,7 @@ template "/etc/haproxy/haproxy.cfg" do
     :defaults_options => defaults_options,
     :defaults_timeouts => defaults_timeouts
   )
-  notifies :reload, "service[haproxy]"
+  notifies :reload, "service[haproxy]", :immediately
 end
 
 service "haproxy" do
