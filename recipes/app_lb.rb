@@ -16,16 +16,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-Chef::Log.info "haproxy::app_lb about to search.. role:#{node['haproxy']['app_server_role']} AND chef_environment:#{node.chef_environment}"
-Chef::Log.info "haproxy::app_lb found #{pool_members.count()} pool members"
-
-# load balancer may be in the pool
-pool_members << node if node.run_list.roles.include?(node['haproxy']['app_server_role'])
-
-Chef::Log.info "haproxy::app_lb found #{pool_members.count()} pool members"
 
 # we prefer connecting via local_ipv4 if # pool members are in the same cloud
-pool_members = search_helper_best_ip("node['haproxy']['app_server_role']} AND chef_environment:#{node.chef_environment}", node['haproxy'][app_servers]) do |ip, other_node|
+pool_members = search_helper_best_ip("node['haproxy']['app_server_role']} AND chef_environment:#{node.chef_environment}", node['haproxy']['app_servers']) do |ip, other_node|
   {:ipaddress => ip, :hostname => other_node['hostname']}
 end
 
@@ -42,7 +35,7 @@ cookbook_file "/etc/default/haproxy" do
 end
 
 template "/etc/haproxy/haproxy.cfg" do
-  source "haproxy-app_lb.cfg.erb"
+  source node['haproxy']['app_lb']['template']
   owner "root"
   group "root"
   mode 00644

@@ -1,0 +1,40 @@
+---
+driver_plugin: vagrant
+driver_config:
+  require_chef_omnibus: 10.24.4
+
+platforms:
+- name: ubuntu-12.04
+  driver_config:
+    box: opscode-ubuntu-12.04
+    box_url: https://opscode-vm-bento.s3.amazonaws.com/vagrant/opscode_ubuntu-12.04_provisionerless.box
+
+suites:
+- name: default
+  run_list:
+  - recipe[haproxy]
+  attributes: {}
+
+- name: app_lb
+  run_list:
+  - recipe[haproxy::app_lb]
+  attributes:
+    haproxy:
+      app_servers: [ { hostname: 'host1', ipaddress: "1.2.3.1" }, { hostname: 'host2', ipaddress: "1.2.3.2" }, { hostname: 'host3', ipaddress: "1.2.3.3" } ]
+
+- name: galera
+  run_list:
+  - recipe[haproxy::app_lb]
+  attributes:
+    haproxy:
+      app_servers: [ { hostname: 'host1', ipaddress: "1.2.3.1" }, { hostname: 'host2', ipaddress: "1.2.3.2" }, { hostname: 'host3', ipaddress: "1.2.3.3" } ]
+      app_lb:
+        template: "haproxy-galera.cfg.erb"
+        single_active: true
+      app_server_role: percona
+      incoming_port: 3306
+      member_port: 3306
+      check_port: 9200
+      balance_algorithm: leastconn
+      admin:
+        address_bind: "0.0.0.0"

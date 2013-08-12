@@ -34,8 +34,12 @@ backend mysql
   mode tcp
   balance <%= node['haproxy']['balance_algorithm'] %>
   option httpchk
+  <% backup=""%>
   <% @pool_members.each do |member| -%>
-  server <%= member[:hostname] %> <%= member[:ipaddress] %>:<%= node['haproxy']['member_port'] %> check port <%= node['haproxy']['check_port'] %> inter 12000 rise 3 fall 3
+    server <%= member[:hostname] %> <%= member[:ipaddress] %>:<%= node['haproxy']['member_port'] %> check port <%= node['haproxy']['check_port'] %> inter 12000 rise 3 fall 3 <%=backup%>
+    <% if node['haproxy']['app_lb']['single_active'] -%>
+    <% backup="backup"%>
+    <% end -%>
   <% end -%>
 
 <% if node['haproxy']['enable_admin'] -%>
