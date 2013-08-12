@@ -18,9 +18,17 @@
 #
 
 # we prefer connecting via local_ipv4 if # pool members are in the same cloud
-pool_members = search_helper_best_ip("node['haproxy']['app_server_role']} AND chef_environment:#{node.chef_environment}", node['haproxy']['app_servers']) do |ip, other_node|
-  {:ipaddress => ip, :hostname => other_node['hostname']}
+pool_members = search_helper_best_ip("role:#{node['haproxy']['app_server_role']} AND chef_environment:#{node.chef_environment}", node['haproxy']['app_servers']) do |ip, other_node|
+  {:ipaddress => ip, :hostname => other_node['hostname'] }
 end
+
+# make sure there is a hostname, even if it's just the ip
+pool_members.each do |x|
+  x[:hostname] = x[:hostname].nil? ? x[:ipaddress] : x[:hostname]
+end
+
+# sort by hostname for consistent "primary" node selection
+pool_members.sort! {|x,y| (x[:hostname].nil? ? 'z' : x[:hostname]) <=> (y[:hostname].nil? ? 'z' : y[:hostname]) }
 
 package "haproxy" do
   action :install

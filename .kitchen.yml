@@ -38,3 +38,20 @@ suites:
       balance_algorithm: leastconn
       admin:
         address_bind: "0.0.0.0"
+
+- name: galera-no-hostnames
+  run_list:
+  - recipe[haproxy::app_lb]
+  attributes:
+    haproxy:
+      app_servers: [ { ipaddress: "1.2.3.1" }, { ipaddress: "1.2.3.2" }, { ipaddress: "1.2.3.3" } ]
+      app_lb:
+        template: "haproxy-galera.cfg.erb"
+        single_active: true
+      app_server_role: percona
+      incoming_port: 3306
+      member_port: 3306
+      check_port: 9200
+      balance_algorithm: leastconn
+      admin:
+        address_bind: "0.0.0.0"
