@@ -36,7 +36,9 @@ default['haproxy']['pid_file'] = "/var/run/haproxy.pid"
 
 default['haproxy']['check_port'] = 9200
 default['haproxy']['app_lb']['template'] = 'haproxy-app_lb.cfg.erb'
-default['haproxy']['app_lb']['single_active'] = false
+default['haproxy']['app_lb']['inter'] = 12000
+default['haproxy']['app_lb']['rise'] = 3
+default['haproxy']['app_lb']['fall'] = 3
 
 default['haproxy']['defaults_options'] = ["httplog", "dontlognull", "redispatch"]
 default['haproxy']['x_forwarded_for'] = false

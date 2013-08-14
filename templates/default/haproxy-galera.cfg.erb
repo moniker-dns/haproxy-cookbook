@@ -36,7 +36,7 @@ backend mysql
   option httpchk
   <% backup=""%>
   <% @pool_members.each do |member| -%>
-    server <%= member[:hostname] %> <%= member[:ipaddress] %>:<%= node['haproxy']['member_port'] %> check port <%= node['haproxy']['check_port'] %> inter 12000 rise 3 fall 3 <%=backup%>
+    server <%= member[:hostname] %> <%= member[:ipaddress] %>:<%= node['haproxy']['member_port'] %> check port <%= node['haproxy']['check_port'] %> inter <%=node['haproxy']['app_lb']['inter']%> rise <%=node['haproxy']['app_lb']['rise']%> fall <%=node['haproxy']['app_lb']['fall']%> <%=backup%>
     <% if node['haproxy']['app_lb']['single_active'] -%>
     <% backup="backup"%>
     <% end -%>
